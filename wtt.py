@@ -6,6 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+from dotenv import load_dotenv
+
+load_dotenv()
 
 download_dir = os.path.abspath('./downloads')
 os.makedirs(download_dir, exist_ok=True)
@@ -16,8 +19,8 @@ firefox_profile_path.set_preference('browser.download.dir', download_dir)
 firefox_profile_path.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/vnd.ms-excel')
 firefox_profile_path.set_preference('browser.download.manager.showWhenStarting', False)
 
-# gecko_service = Service('your geckoodriver :D')
-gecko_service = Service('/Users/timtr/geckodriver')
+GECKODRIVER_PATH = os.getenv('GECKODRIVER_PATH', 'geckodriver')
+gecko_service = Service(GECKODRIVER_PATH)
 
 firefox_options = Options()
 firefox_options.profile = firefox_profile_path

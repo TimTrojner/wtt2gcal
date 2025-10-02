@@ -63,7 +63,10 @@ Create a .env file in the project folder:
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHANNEL_ID=your_channel_id_here
 SHARED_CALENDAR_ID=your_shared_calendar_id
+GECKODRIVER_PATH=/path/to/your/geckodriver
 ```
+
+**Note**: If `GECKODRIVER_PATH` is not set, it will default to `geckodriver` (assumes it's in your PATH).
 
 ### 5️⃣ Configure config.json
 
@@ -89,8 +92,6 @@ Create or edit `config.json` in the project folder to customize your setup:
 - **scrape_url**: The URL to scrape your timetable from
 - **excluded_groups**: Array of strings - events containing any of these in the description will be filtered out
 - **subject_color_map**: Map of subject names to Google Calendar color IDs (1-11)
-
-PS you also need the geckodriver :)
 
 ### ▶️ Usage
 
