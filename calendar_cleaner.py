@@ -1,8 +1,10 @@
 import os
 from icalendar import Calendar
 
-def clean_ics_file(input_file, output_file):
-    """Removes events containing 'RV1' in the description from an .ics file."""
+def clean_ics_file(input_file, output_file, excluded_groups=None):
+    """Removes events containing excluded groups in the description from an .ics file."""
+    if excluded_groups is None:
+        excluded_groups = ['RV1', 'Erasmus']
 
     output_dir = os.path.dirname(output_file)
     if output_dir and not os.path.exists(output_dir):
@@ -20,7 +22,8 @@ def clean_ics_file(input_file, output_file):
         if component.name == 'VEVENT':
             description = component.get('DESCRIPTION', '').replace('\\,', ',').replace('\\n', ' ').strip()
 
-            if 'RV1' in description or 'Erasmus' in description:
+            # Check if any excluded group is in the description
+            if any(excluded_group in description for excluded_group in excluded_groups):
                 continue
 
             summary = component.get('SUMMARY', 'No Title')

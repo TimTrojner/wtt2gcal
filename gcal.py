@@ -6,17 +6,12 @@ from icalendar import Calendar
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 SERVICE_ACCOUNT_FILE = 'service_account.json'
 
-SUBJECT_COLOR_MAP = {
-    'INTELIGENTNI SISTEMI': '11',
-    'RAČUNALNIŠKA OBDELAVA SIGNALOV IN SLIK': '9',
-    'POVEZLJIVI SISTEMI IN INTELIGENTNE STORITVE': '6',
-    'JEZIKOVNE TEHNOLOGIJE': '5',
-    'IZBRANI ALGORITMI KOMBINATORIKE': '8',
-}
-
-def get_event_color(summary):
+def get_event_color(summary, subject_color_map=None):
     """Determine the event color based on subject."""
-    for subject, color_id in SUBJECT_COLOR_MAP.items():
+    if subject_color_map is None:
+        subject_color_map = {}
+    
+    for subject, color_id in subject_color_map.items():
         if subject.lower() in summary.lower():
             return color_id
     return '1'
@@ -31,7 +26,7 @@ def list_calendars(service):
     for calendar in calendars['items']:
         print(f'Name: {calendar['summary']}, ID: {calendar['id']}')
 
-def upload_to_google_calendar(service, ics_file, calendar_id):
+def upload_to_google_calendar(service, ics_file, calendar_id, subject_color_map=None):
     """Upload events from .ics to Google Calendar."""
 
     with open(ics_file, 'r', encoding='utf-8') as f:
@@ -43,7 +38,7 @@ def upload_to_google_calendar(service, ics_file, calendar_id):
     for component in calendar.walk():
         if component.name == 'VEVENT':
             summary = component.get('SUMMARY', 'No Title')
-            color_id = get_event_color(summary)
+            color_id = get_event_color(summary, subject_color_map)
 
             event = {
                 'summary': summary,

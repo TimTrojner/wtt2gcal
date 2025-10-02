@@ -1,4 +1,5 @@
 import os
+import json
 import gcal
 import calendar_cleaner
 import util
@@ -8,6 +9,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Load config file
+with open('config.json', 'r', encoding='utf-8') as f:
+    config = json.load(f)
+
 SHARED_CALENDAR_ID = os.getenv('SHARED_CALENDAR_ID')
 input_ics = 'downloads/calendar.ics'
 output_ics = 'purged/calendar.ics'
@@ -15,11 +20,11 @@ output_ics = 'purged/calendar.ics'
 try:
    print('Downloading calendar...')
    driver, wait = wtt.init_driver()
-   driver.get('https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254,538;0;0;')
+   driver.get(config['scrape_url'])
    downloaded_files = wtt.download_ical(wait)
 
    print('Purging calendar...')
-   calendar_cleaner.clean_ics_file(input_ics, output_ics)
+   calendar_cleaner.clean_ics_file(input_ics, output_ics, config['excluded_groups'])
 
    print('Checking if calendar changed')
    calHash = util.compute_file_hash('purged/calendar.ics')
@@ -35,7 +40,7 @@ try:
       util.save_hash(calHash, 'hash/calHash')
       service = gcal.authenticate_google_service()
       gcal.delete_all_events(calendar_id=SHARED_CALENDAR_ID, service=service)
-      gcal.upload_to_google_calendar(service, output_ics, calendar_id=SHARED_CALENDAR_ID)
+      gcal.upload_to_google_calendar(service, output_ics, calendar_id=SHARED_CALENDAR_ID, subject_color_map=config['subject_color_map'])
       send_telegram_message('✅ Calendar updated successfully!')
    else:
       print('Calendar is the same')

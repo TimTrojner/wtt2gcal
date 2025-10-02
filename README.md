@@ -65,6 +65,31 @@ TELEGRAM_CHANNEL_ID=your_channel_id_here
 SHARED_CALENDAR_ID=your_shared_calendar_id
 ```
 
+### 5️⃣ Configure config.json
+
+Create or edit `config.json` in the project folder to customize your setup:
+
+```json
+{
+  "scrape_url": "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254,538;0;0;",
+  "excluded_groups": [
+    "RV1",
+    "Erasmus"
+  ],
+  "subject_color_map": {
+    "INTELIGENTNI SISTEMI": "11",
+    "RAČUNALNIŠKA OBDELAVA SIGNALOV IN SLIK": "9",
+    "POVEZLJIVI SISTEMI IN INTELIGENTNE STORITVE": "6",
+    "JEZIKOVNE TEHNOLOGIJE": "5",
+    "IZBRANI ALGORITMI KOMBINATORIKE": "8"
+  }
+}
+```
+
+- **scrape_url**: The URL to scrape your timetable from
+- **excluded_groups**: Array of strings - events containing any of these in the description will be filtered out
+- **subject_color_map**: Map of subject names to Google Calendar color IDs (1-11)
+
 PS you also need the geckodriver :)
 
 ### ▶️ Usage
@@ -78,5 +103,14 @@ Or set up a cron job for automatic updates:
 `0 1 * * * /bin/bash -c 'source /root/miniconda3/bin/activate urnik && python /root/urnik/main.py >> /root/urnik/job_log.txt 2>&1 && conda deactivate'`
 
 
+
 ## 📌 Configuration
-Hardcoded for now I was lazy 😆.
+
+You can customize the behavior through `config.json`:
+
+- **scrape_url**: Change this to your specific timetable URL
+- **excluded_groups**: Add or remove group identifiers (e.g., "RV1", "RV2", "Erasmus") to filter out unwanted events
+- **subject_color_map**: Customize colors for different subjects using Google Calendar color IDs (1-11)
+
+Example: To exclude RV2 instead of RV1, simply change `"RV1"` to `"RV2"` in the excluded_groups array.
+
