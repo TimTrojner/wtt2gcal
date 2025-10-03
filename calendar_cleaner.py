@@ -27,10 +27,14 @@ def clean_ics_file(input_file, output_file, excluded_groups=None):
                 continue
 
             summary = component.get('SUMMARY', 'No Title')
-            if 'RV' in description:
+            if ' RV' in description:
                 new_summary = summary  + ' - RV'
-            else:
+            elif ' PR' in description:
                 new_summary = summary  + ' - PR'
+            elif ' SV' in description:
+                new_summary = summary  + ' - SV'
+            elif ' LV' in description:
+                new_summary = summary  + ' - LV'
             component['SUMMARY'] = new_summary
             cleaned_calendar.add_component(component)
 
