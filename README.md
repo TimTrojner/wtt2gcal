@@ -27,9 +27,9 @@ Now, I never have to check the awful timetable app again. 🎉
 
 ## 🚀 How It Works
 
-1. Downloads the latest .ics file from the school timetable system
-2. Cleans the file, removing specific events (e.g., Erasmus, RV1)
-3. Checks for changes in the timetable
+1. Downloads `.ics` files from one or more school timetable URLs
+2. Merges and cleans the files, removing specific events (e.g., Erasmus, RV1)
+3. Checks for changes in the combined timetable
 4. Deletes old events from Google Calendar
 5. Uploads new events to Google Calendar
 6. Sends a Telegram notification if a change is detected
@@ -37,9 +37,21 @@ Now, I never have to check the awful timetable app again. 🎉
 ## 🛠️ Setup
 ### 1️⃣ Install Requirements
 
-Make sure you have Python 3+ and conda installed, then install dependencies:
+It is recommended to use a virtual environment. You can use conda or venv:
 
-conda install --yes --file requirements-arm/x86.txt
+**Using Conda:**
+```bash
+conda create --name urnik python=3.12
+conda activate urnik
+pip install -r requirements.txt
+```
+
+**Using venv:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ### 2️⃣ Set Up Google Calendar API
 
@@ -64,9 +76,12 @@ TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHANNEL_ID=your_channel_id_here
 SHARED_CALENDAR_ID=your_shared_calendar_id
 GECKODRIVER_PATH=/path/to/your/geckodriver
+LOG_LEVEL=INFO
 ```
 
-**Note**: If `GECKODRIVER_PATH` is not set, it will default to `geckodriver` (assumes it's in your PATH).
+**Notes**:
+- If `GECKODRIVER_PATH` is not set, it will default to `geckodriver` (assumes it's in your PATH).
+- `LOG_LEVEL` controls logging verbosity. Valid values: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`. Defaults to `INFO`.
 
 ### 5️⃣ Configure config.json
 
@@ -74,7 +89,10 @@ Create or edit `config.json` in the project folder to customize your setup:
 
 ```json
 {
-  "scrape_url": "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254,538;0;0;",
+  "scrape_urls": [
+    "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254,538;0;0;",
+    "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254,539;0;0;"
+  ],
   "excluded_groups": [
     "RV1",
     "Erasmus"
@@ -89,8 +107,8 @@ Create or edit `config.json` in the project folder to customize your setup:
 }
 ```
 
-- **scrape_url**: The URL to scrape your timetable from
-- **excluded_groups**: Array of strings - events containing any of these in the description will be filtered out
+- **scrape_urls**: Array of URLs to scrape timetables from (events are merged into a single calendar)
+- **excluded_groups**: Array of strings - events containing any of these in the description will be filtered out (applied across all URLs)
 - **subject_color_map**: Map of subject names to Google Calendar color IDs (1-11)
 
 ### ▶️ Usage
@@ -109,9 +127,11 @@ Or set up a cron job for automatic updates:
 
 You can customize the behavior through `config.json`:
 
-- **scrape_url**: Change this to your specific timetable URL
-- **excluded_groups**: Add or remove group identifiers (e.g., "RV1", "RV2", "Erasmus") to filter out unwanted events
+- **scrape_urls**: Add one or more timetable URLs. Events from all URLs are merged into a single calendar before syncing.
+- **excluded_groups**: Add or remove group identifiers (e.g., "RV1", "RV2", "Erasmus") to filter out unwanted events. Exclusions apply across all URLs.
 - **subject_color_map**: Customize colors for different subjects using Google Calendar color IDs (1-11)
 
 Example: To exclude RV2 instead of RV1, simply change `"RV1"` to `"RV2"` in the excluded_groups array.
+
+> **Note**: The legacy `scrape_url` (single string) is still supported for backward compatibility.
 

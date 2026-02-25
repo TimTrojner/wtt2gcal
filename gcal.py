@@ -1,7 +1,10 @@
 import time
+import logging
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from icalendar import Calendar
+
+logger = logging.getLogger('urnik.gcal')
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 SERVICE_ACCOUNT_FILE = 'service_account.json'
@@ -19,12 +22,14 @@ def get_event_color(summary, subject_color_map=None):
 def authenticate_google_service():
     """Authenticate using a Google Service Account."""
     creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-    return build('calendar', 'v3', credentials=creds)
+    service = build('calendar', 'v3', credentials=creds)
+    logger.info('Authenticated with Google Calendar API')
+    return service
 
 def list_calendars(service):
     calendars = service.calendarList().list().execute()
     for calendar in calendars['items']:
-        print(f'Name: {calendar['summary']}, ID: {calendar['id']}')
+        logger.info('Calendar: %s (ID: %s)', calendar['summary'], calendar['id'])
 
 def upload_to_google_calendar(service, ics_file, calendar_id, subject_color_map=None):
     """Upload events from .ics to Google Calendar."""
@@ -32,8 +37,11 @@ def upload_to_google_calendar(service, ics_file, calendar_id, subject_color_map=
     with open(ics_file, 'r', encoding='utf-8') as f:
         calendar = Calendar.from_ical(f.read())
 
-    cal_len = len(calendar.walk())
+    # Count VEVENT components only
+    total_events = sum(1 for c in calendar.walk() if c.name == 'VEVENT')
     events_added = 0
+
+    logger.info('Uploading %d events to Google Calendar...', total_events)
 
     for component in calendar.walk():
         if component.name == 'VEVENT':
@@ -56,12 +64,11 @@ def upload_to_google_calendar(service, ics_file, calendar_id, subject_color_map=
             }
 
             service.events().insert(calendarId=calendar_id, body=event).execute()
-            print(f'Added event: {event.get('summary', 'No Title')} (ID: {event.get('id')})')
             events_added += 1
-            print(f'Added {events_added} of {cal_len} events')
+            logger.debug('Added event %d/%d: %s', events_added, total_events, summary)
             time.sleep(.5)
 
-    print('Events uploaded successfully.')
+    logger.info('Upload complete: %d events added', events_added)
 
 def add_shared_calendar(shared_calendar_id, service):
     """Manually add a shared calendar to the service account's calendar list."""
@@ -71,7 +78,7 @@ def add_shared_calendar(shared_calendar_id, service):
     }
 
     service.calendarList().insert(body=calendar_list_entry).execute()
-    print(f'Shared calendar {shared_calendar_id} added successfully!')
+    logger.info('Shared calendar %s added successfully', shared_calendar_id)
 
 def delete_all_events(calendar_id, service):
     events_result = service.events().list(
@@ -80,29 +87,31 @@ def delete_all_events(calendar_id, service):
     ).execute()
 
     events = events_result.get('items', [])
-    events_length = len(events)
-    num_of_deleted_events = 0
+    total = len(events)
 
     if not events:
-        print('No events found')
+        logger.info('No events to delete')
         return
+
+    logger.info('Deleting %d events from calendar...', total)
+    deleted = 0
 
     for event in events:
         event_id = event['id']
         service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
-        print(f'Deleted event: {event.get('summary', 'No Title')} (ID: {event_id})')
-        num_of_deleted_events += 1
-        print(f'Deleted {num_of_deleted_events} of {events_length} events')
+        deleted += 1
+        logger.debug('Deleted event %d/%d: %s (ID: %s)',
+                      deleted, total, event.get('summary', 'No Title'), event_id)
         time.sleep(.5)
 
-    print('✅ All events deleted successfully.')
+    logger.info('Deletion complete: %d events removed', deleted)
 
 
 # need to be owner rip - working with service account
 def clear_calendar(calendar_id, service):
     """Wipes all events from the calendar instantly (irreversible)."""
     service.calendars().clear(calendarId=calendar_id).execute()
-    print('✅ Calendar cleared successfully!')
+    logger.info('Calendar cleared')
 
 def list_events(service, calendar_id):
     """List events from a Google Calendar ID."""
@@ -110,8 +119,8 @@ def list_events(service, calendar_id):
         calendarId=calendar_id,
         singleEvents=True
     ).execute()
-    print('Raw events response:', events_result)
+    logger.debug('Raw events response: %s', events_result)
     events = events_result.get('items', [])
     if not events:
-        print('No events found.')
+        logger.info('No events found')
         return

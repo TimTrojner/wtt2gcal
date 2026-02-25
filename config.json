@@ -1,17 +1,22 @@
 {
-  "scrape_url": "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;423,689;0;1159,1158,1336,1170,1373;",
-  "excluded_groups": [
-    "RV 2",
-    "LV 2",
-    "Erasmus",
-    "RAČUNALNIŠKI VID",
-    "ALGORITMI OBDELAVE PODATKOV DALJINSKEGA ZAZNAVANJA"
+  "scrape_urls": [
+    "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;583,582;0;0;",
+    "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254;0;0;"
+  ],
+    "excluded_groups": [
+    "VIRTUALNI STROJI IN UPRAVLJANJE Z RAČUNALNIŠKIMI VIRI",
+    "INTELIGENTNI SISTEMI",
+    "JEZIKOVNE TEHNOLOGIJE",
+    "POVEZLJIVI SISTEMI IN INTELIGENTNE STORITVE",
+    "IZBRANI ALGORITMI KOMBINATORIKE",
+    "Erasmus"
   ],
   "subject_color_map": {
-    "EVOLUCIJSKO RAČUNANJE": "11",
-    "NAPREDNA OBDELAVA SLIK": "9",
+    "KVALITETA PROGRAMSKE OPREME": "11",
+    "RAČUNALNIŠKA OBDELAVA SIGNALOV IN SLIK": "9",
     "OPTIMIZACIJSKE METODE": "6",
     "NAPREDNE ARHITEKTURE IN UČENJE GLOBOKIH NEVRONSKIH MREŽ": "5",
     "VITKO UPRAVLJANJE V INŽENIRSTVU": "8"
   }
 }
+
