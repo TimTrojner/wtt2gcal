@@ -1,14 +1,16 @@
 {
   "scrape_urls": [
     "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;583,582;0;0;",
-    "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;254;0;0;"
+    "https://www.wise-tt.com/wtt_um_feri/index.jsp?filterId=0;257;0;0;"
   ],
     "excluded_groups": [
     "VIRTUALNI STROJI IN UPRAVLJANJE Z RAČUNALNIŠKIMI VIRI",
-    "INTELIGENTNI SISTEMI",
+    "VSEPRISOTNO RAČUNALNIŠTVO",
+    "NEVRO, NANO IN KVANTNO RAČUNALNIŠTVO",
+    "ALGORITMI ANALIZE MASIVNIH PODATKOV",
     "JEZIKOVNE TEHNOLOGIJE",
-    "POVEZLJIVI SISTEMI IN INTELIGENTNE STORITVE",
-    "IZBRANI ALGORITMI KOMBINATORIKE",
+    "RV1",
+    "RV - 1",
     "Erasmus"
   ],
   "subject_color_map": {
